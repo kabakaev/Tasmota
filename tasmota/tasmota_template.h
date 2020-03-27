@@ -32,6 +32,9 @@ enum UserSelectablePins {
   GPIO_I2C_SCL,        // I2C SCL
   GPIO_I2C_SDA,        // I2C SDA
   GPIO_WS2812,         // WS2812 Led string
+  GPIO_WS2813,         // WS2812 Led string
+  GPIO_WS2814,         // WS2812 Led string
+  GPIO_WS2815,         // WS2812 Led string
   GPIO_IRSEND,         // IR remote
   GPIO_SWT1,           // User connected external switches
   GPIO_SWT2,
@@ -241,7 +244,7 @@ const char kSensorNames[] PROGMEM =
   D_SENSOR_DHT11 "|" D_SENSOR_AM2301 "|" D_SENSOR_SI7021 "|"
   D_SENSOR_DS18X20 "|"
   D_SENSOR_I2C_SCL "|" D_SENSOR_I2C_SDA "|"
-  D_SENSOR_WS2812 "|"
+  D_SENSOR_WS2812 "|" D_SENSOR_WS2813 "|" D_SENSOR_WS2814 "|" D_SENSOR_WS2815 "|"
   D_SENSOR_IRSEND "|"
   D_SENSOR_SWITCH "1|" D_SENSOR_SWITCH "2|" D_SENSOR_SWITCH "3|" D_SENSOR_SWITCH "4|" D_SENSOR_SWITCH "5|" D_SENSOR_SWITCH "6|" D_SENSOR_SWITCH "7|" D_SENSOR_SWITCH "8|"
   D_SENSOR_BUTTON "1|" D_SENSOR_BUTTON "2|" D_SENSOR_BUTTON "3|" D_SENSOR_BUTTON "4|"
@@ -584,6 +587,15 @@ const uint8_t kGpioNiceList[] PROGMEM = {
 #ifdef USE_LIGHT
 #ifdef USE_WS2812
   GPIO_WS2812,         // WS2812 Led string
+#endif
+#ifdef USE_WS2812
+  GPIO_WS2813,         // WS2812 Led string
+#endif
+#ifdef USE_WS2812
+  GPIO_WS2814,         // WS2812 Led string
+#endif
+#ifdef USE_WS2812
+  GPIO_WS2815,         // WS2812 Led string
 #endif
 #ifdef USE_ARILUX_RF
   GPIO_ARIRFRCV,       // AriLux RF Receive input

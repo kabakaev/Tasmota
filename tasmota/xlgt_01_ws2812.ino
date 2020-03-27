@@ -17,6 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define USE_LIGHT
+#define USE_WS2812
+
 #ifdef USE_LIGHT
 #ifdef USE_WS2812
 /*********************************************************************************************\
@@ -88,6 +91,51 @@ void (* const Ws2812Command[])(void) PROGMEM = {
 #endif  // USE_WS2812_DMA
 
 NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType> *strip = nullptr;
+NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType> *strip2 = nullptr;
+NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType> *strip3 = nullptr;
+NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType> *strip4 = nullptr;
+
+void SetPixelColor(uint16_t indexPixel, typename Neo4Elements::ColorObject color)
+{
+    strip->SetPixelColor(indexPixel, color);
+    if (pin[GPIO_WS2813] < 99) {
+      strip2->SetPixelColor(indexPixel, color);
+    }
+    if (pin[GPIO_WS2814] < 99) {
+      strip3->SetPixelColor(indexPixel, color);
+    }
+    if (pin[GPIO_WS2815] < 99) {
+      strip4->SetPixelColor(indexPixel, color);
+    }
+};
+
+void Show(bool maintainBufferConsistency = true)
+{
+    strip->Show(maintainBufferConsistency);
+    if (pin[GPIO_WS2813] < 99) {
+      strip2->Show(maintainBufferConsistency);
+    }
+    if (pin[GPIO_WS2814] < 99) {
+      strip3->Show(maintainBufferConsistency);
+    }
+    if (pin[GPIO_WS2815] < 99) {
+      strip4->Show(maintainBufferConsistency);
+    }
+}
+
+void ClearTo(typename Neo4Elements::ColorObject color)
+{
+    strip->ClearTo(color);
+    if (pin[GPIO_WS2813] < 99) {
+      strip2->ClearTo(color);
+    }
+    if (pin[GPIO_WS2814] < 99) {
+      strip3->ClearTo(color);
+    }
+    if (pin[GPIO_WS2815] < 99) {
+      strip4->ClearTo(color);
+    }
+}
 
 struct WsColor {
   uint8_t red, green, blue;
@@ -153,9 +201,11 @@ void Ws2812StripShow(void)
       c.W = ledGamma(c.W);
 #endif
       strip->SetPixelColor(i, c);
+      SetPixelColor(i, c);
     }
   }
   strip->Show();
+  Show();
 }
 
 int mod(int a, int b)
@@ -181,6 +231,7 @@ void Ws2812UpdatePixelColor(int position, struct WsColor hand_color, float offse
   color.G = tmin(color.G + ((hand_color.green / dimmer) * offset), 255);
   color.B = tmin(color.B + ((hand_color.blue / dimmer) * offset), 255);
   strip->SetPixelColor(mod_position, color);
+  SetPixelColor(mod_position, color);
 }
 
 void Ws2812UpdateHand(int position, uint32_t index)
@@ -291,6 +342,7 @@ void Ws2812Gradient(uint32_t schemenr)
       c.B = currentColor.blue;
     }
     strip->SetPixelColor(i, c);
+    SetPixelColor(i, c);
     oldColor = currentColor;
   }
   Ws2812StripShow();
@@ -336,6 +388,7 @@ void Ws2812Bars(uint32_t schemenr)
     c.G = mcolor[colorIndex].green;
     c.B = mcolor[colorIndex].blue;
     strip->SetPixelColor(i, c);
+    SetPixelColor(i, c);
   }
   Ws2812StripShow();
 }
@@ -343,7 +396,9 @@ void Ws2812Bars(uint32_t schemenr)
 void Ws2812Clear(void)
 {
   strip->ClearTo(0);
+  ClearTo(0);
   strip->Show();
+  Show();
   Ws2812.show_next = 1;
 }
 
@@ -361,15 +416,18 @@ void Ws2812SetColor(uint32_t led, uint8_t red, uint8_t green, uint8_t blue, uint
   lcolor.B = blue;
   if (led) {
     strip->SetPixelColor(led -1, lcolor);  // Led 1 is strip Led 0 -> substract offset 1
+    SetPixelColor(led -1, lcolor);  // Led 1 is strip Led 0 -> substract offset 1
   } else {
 //    strip->ClearTo(lcolor);  // Set WS2812_MAX_LEDS pixels
     for (uint32_t i = 0; i < Settings.light_pixels; i++) {
       strip->SetPixelColor(i, lcolor);
+      SetPixelColor(i, lcolor);
     }
   }
 
   if (!Ws2812.suspend_update) {
     strip->Show();
+    Show();
     Ws2812.show_next = 1;
   }
 }
@@ -411,6 +469,7 @@ void Ws2812ForceUpdate (void)
 {
   Ws2812.suspend_update = false;
   strip->Show();
+  Show();
   Ws2812.show_next = 1;
 }
 
@@ -454,6 +513,18 @@ void Ws2812ModuleSelected(void)
     // For DMA, the Pin is ignored as it uses GPIO3 due to DMA hardware use.
     strip = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, pin[GPIO_WS2812]);
     strip->Begin();
+    if (pin[GPIO_WS2813] < 99) {
+      strip2 = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, pin[GPIO_WS2813]);
+      strip2->Begin();
+    }
+    if (pin[GPIO_WS2814] < 99) {
+      strip3 = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, pin[GPIO_WS2814]);
+      strip3->Begin();
+    }
+    if (pin[GPIO_WS2815] < 99) {
+      strip4 = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, pin[GPIO_WS2815]);
+      strip4->Begin();
+    }
 
     Ws2812Clear();
 
